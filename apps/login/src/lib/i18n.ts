@@ -57,6 +57,10 @@ export const LANGS: Lang[] = [
     code: "uk",
   },
   {
+    name: "Lietuvių",
+    code: "lt",
+  },
+  {
     name: "العربية",
     code: "ar",
   },
