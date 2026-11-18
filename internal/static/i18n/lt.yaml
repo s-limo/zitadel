@@ -330,6 +330,7 @@ Errors:
       OIDCAuthMethodNoSecret: "Pasirinktas OIDC autentifikavimo metodas nereikalauja paslapties"
       APIAuthMethodNoSecret: "Pasirinktas API autentifikavimo metodas nereikalauja paslapties"
       AuthMethodNoPrivateKeyJWT: "Pasirinktas autentifikavimo metodas nereikalauja rakto"
+      ClientSecretNotSet: "Kliento paslaptis nenustatyta"
       ClientSecretInvalid: "Kliento paslaptis negalioja"
       Key:
         AlreadyExisting: "Programos raktas jau egzistuoja"

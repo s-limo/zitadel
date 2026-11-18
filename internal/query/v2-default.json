@@ -3831,6 +3831,18 @@
       }
     },
     "idp": {
+      "linkingSuccess": {
+        "title": "Paskyra susieta",
+        "description": "Sėkmingai susiejote savo paskyrą!"
+      },
+      "loginSuccess": {
+        "title": "Prisijungimas sėkmingas",
+        "description": "Sėkmingai prisijungėte!"
+      },
+      "registerSuccess": {
+        "title": "Registracija sėkminga",
+        "description": "Sėkmingai užsiregistravote!"
+      },
       "title": "Prisijungti su SSO",
       "description": "Pasirinkite vieną iš šių teikėjų, norėdami prisijungti",
       "orSignInWith": "arba prisijunkite su",
