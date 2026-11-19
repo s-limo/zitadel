@@ -353,7 +353,10 @@ func (p *smtpConfigProjection) reduceSMTPConfigChanged(event eventstore.Event) (
 		smtpColumns = append(smtpColumns, handler.NewCol(SMTPConfigSMTPColumnPlainAuthPassword, *e.Password))
 	}
 
-	if !e.PlainAuth.IsEmpty() {
+	// ChangeSMTPConfigSMTPPassword sets both e.Password and e.PlainAuth.Password;
+	// adding the column twice makes the UPDATE fail with "multiple assignments
+	// to same column" and the projection never applies the change.
+	if !e.PlainAuth.IsEmpty() && e.Password == nil {
 		smtpColumns = append(smtpColumns,
 			handler.NewCol(SMTPConfigSMTPColumnPlainAuthPassword, e.PlainAuth.Password),
 		)
