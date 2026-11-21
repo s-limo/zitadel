@@ -4,10 +4,9 @@ import { ChooseSecondFactor } from "@/components/choose-second-factor";
 import { DynamicTheme } from "@/components/dynamic-theme";
 import { Translated } from "@/components/translated";
 import { UserAvatar } from "@/components/user-avatar";
-import { getSessionCookieById } from "@/lib/cookies";
 import { getServiceConfig } from "@/lib/service-url";
-import { loadMostRecentSession } from "@/lib/session";
-import { getBrandingSettings, getSession, listAuthenticationMethodTypes } from "@/lib/zitadel";
+import { loadMostRecentSession, loadSessionById as loadSessionByIdFromCookie } from "@/lib/session";
+import { getBrandingSettings, listAuthenticationMethodTypes } from "@/lib/zitadel";
 import { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
 import { headers } from "next/headers";
@@ -49,22 +48,16 @@ export default async function Page(props: { searchParams: Promise<Record<string 
   }
 
   async function loadSessionById(sessionId: string, organization?: string) {
-    const recent = await getSessionCookieById({ sessionId, organization });
+    const session = await loadSessionByIdFromCookie(serviceConfig, sessionId, organization);
 
-    if (!recent) {
-      return undefined;
+    if (session && session.factors?.user?.id) {
+      return listAuthenticationMethodTypes({ serviceConfig, userId: session.factors.user.id }).then((methods) => {
+        return {
+          factors: session.factors,
+          authMethods: methods.authMethodTypes ?? [],
+        };
+      });
     }
-
-    return getSession({ serviceConfig, sessionId: recent.id, sessionToken: recent.token }).then((response) => {
-      if (response?.session && response.session.factors?.user?.id) {
-        return listAuthenticationMethodTypes({ serviceConfig, userId: response.session.factors.user.id }).then((methods) => {
-          return {
-            factors: response.session?.factors,
-            authMethods: methods.authMethodTypes ?? [],
-          };
-        });
-      }
-    });
   }
 
   const branding = await getBrandingSettings({ serviceConfig, organization });

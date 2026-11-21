@@ -4,16 +4,9 @@ import { ChooseSecondFactorToSetup } from "@/components/choose-second-factor-to-
 import { DynamicTheme } from "@/components/dynamic-theme";
 import { Translated } from "@/components/translated";
 import { UserAvatar } from "@/components/user-avatar";
-import { getSessionCookieById } from "@/lib/cookies";
 import { getServiceConfig } from "@/lib/service-url";
-import { loadMostRecentSession } from "@/lib/session";
-import {
-  getBrandingSettings,
-  getLoginSettings,
-  getSession,
-  getUserByID,
-  listAuthenticationMethodTypes,
-} from "@/lib/zitadel";
+import { loadMostRecentSession, loadSessionById as loadSessionByIdFromCookie } from "@/lib/session";
+import { getBrandingSettings, getLoginSettings, getUserByID, listAuthenticationMethodTypes } from "@/lib/zitadel";
 import { Timestamp, timestampDate } from "@zitadel/client";
 import { Session } from "@zitadel/proto/zitadel/session/v2/session_pb";
 import { SecondFactorType } from "@zitadel/proto/zitadel/settings/v2/login_settings_pb";
@@ -61,8 +54,9 @@ export default async function Page(props: { searchParams: Promise<Record<string 
   async function getAuthMethodsAndUser(session?: Session) {
     const userId = session?.factors?.user?.id;
 
+    // No (or an ended) session: let the page render its "unknown context" state instead of crashing.
     if (!userId) {
-      throw Error("Could not get user id from session");
+      return undefined;
     }
 
     return listAuthenticationMethodTypes({ serviceConfig, userId }).then((methods) => {
@@ -94,15 +88,8 @@ export default async function Page(props: { searchParams: Promise<Record<string 
   }
 
   async function loadSessionById(sessionId: string, organization?: string) {
-    const recent = await getSessionCookieById({ sessionId, organization });
-
-    if (!recent) {
-      return undefined;
-    }
-
-    return getSession({ serviceConfig, sessionId: recent.id, sessionToken: recent.token }).then((sessionResponse) => {
-      return getAuthMethodsAndUser(sessionResponse.session);
-    });
+    const session = await loadSessionByIdFromCookie(serviceConfig, sessionId, organization);
+    return getAuthMethodsAndUser(session);
   }
 
   const branding = await getBrandingSettings({ serviceConfig, organization });
