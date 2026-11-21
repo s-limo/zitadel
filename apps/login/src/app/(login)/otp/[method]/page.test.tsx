@@ -66,17 +66,18 @@ describe("otp page", () => {
   afterEach(cleanup);
 
   // A rejected session cookie must not crash the render: the shared loaders resolve undefined and
-  // the page falls back to its no-session alert on every branch.
+  // the page falls back to its no-session alert on every branch. (On v4.16 the page shows
+  // "unknownContext" for every branch; upstream later added a "sessionExpired" alert.)
   test.each([
     {
       name: "sessionId and loginName",
       searchParams: { sessionId: "session-1", loginName: "user@example.com", organization: "org-1" },
-      expectedAlert: "sessionExpired",
+      expectedAlert: "unknownContext",
     },
     {
       name: "loginName only",
       searchParams: { loginName: "user@example.com", organization: "org-1" },
-      expectedAlert: "sessionExpired",
+      expectedAlert: "unknownContext",
     },
     {
       name: "neither sessionId nor loginName",
